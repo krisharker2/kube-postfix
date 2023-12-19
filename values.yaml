@@ -1,0 +1,72 @@
+replicaCount: 1
+nameOverride: ""
+fullnameOverride: ""
+image:
+  repository: 231139847997.dkr.ecr.us-gov-west-1.amazonaws.com/platform/image/advana/smtprelay
+  tag: latest
+  pullPolicy: IfNotPresent
+imagePullSecrets:
+  - name: private-registry
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+pod:
+  securityContext:
+    capabilities:
+      drop:
+      - ALL
+container:
+  postfix:
+    securityContext:
+      capabilities:
+        drop:
+        - ALL
+    entrypoint:
+      - "/bin/sh"
+      - "-c"
+    command:
+      - "/bin/sh"
+      - "-c"
+      - "/usr/sbin/postfix & ; while : ; do sleep 300 ; done"
+config:
+  general: {}
+  postfix:
+    # Add your postfix configurations here
+persistence:
+  enabled: true
+  accessModes:
+    - ReadWriteOnce
+  existingClaim: ""
+  size: 1Gi
+  storageClass: ""
+readinessProbe:
+  exec:
+    command:
+      - echo "ready"
+livenessProbe:
+  exec:
+    command:
+      - echo "live"
+startupProbe:
+  exec:
+    command:
+      - echo "start"
+wrapper:
+  enabled: true
+istio:
+  injection: "enabled"
+  peerAuthentications:
+    - name: "postfix"
+      spec:
+        selector:
+          matchLabels:
+            app.kubernetes.io/name: "postfix"

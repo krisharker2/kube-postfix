@@ -1,0 +1,4 @@
+apiVersion: v2
+name: postfix-chart
+description: Helm chart for deploying Postfix
+version: 0.1.0

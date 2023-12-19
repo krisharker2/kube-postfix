@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "my-postfix-chart.fullname" . }}
+  labels:
+    app: {{ include "my-postfix-chart.name" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ include "my-postfix-chart.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "my-postfix-chart.name" . }}
+    spec:
+      containers:
+      - name: postfix
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources:
+          limits:
+            cpu: {{ .Values.resources.limits.cpu }}
+            memory: {{ .Values.resources.limits.memory }}
+          requests:
+            cpu: {{ .Values.resources.requests.cpu }}
+            memory: {{ .Values.resources.requests.memory }}
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+        command:
+          - "/bin/sh"
+          - "-c"
+          - "/usr/sbin/postfix & ; while : ; do sleep 300 ; done"
