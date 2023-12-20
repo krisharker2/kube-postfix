@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ template "postfix.fullname" . }}
-  namespace: {{ template "postfix.namespace" . }}
+  namespace: {{ template "postfix.name" . }}
   labels:
     app: {{ template "postfix.name" . }}
 spec:
