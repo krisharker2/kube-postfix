@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postfix-1
-  namespace: postfix
+  name: {{ template "postfix.fullname" . }}
+  namespace: {{ template "postfix.namespace" . }}
   labels:
-    app: postfix-1
+    app: {{ template "postfix.name" . }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: postfix-1
+      app: {{ template "postfix.name" . }}
   template:
     metadata:
       labels:
-        app: postfix-1
+        app: {{ template "postfix.name" . }}
     spec:
       containers:
-      - name: postfix-mail
-        image: 231139847997.dkr.ecr.us-gov-west-1.amazonaws.com/platform/image/advana/smtprelay:latest
+      - name: {{ template "postfix.name" . }}
+        image: '{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}'
         command: ["/bin/sh", "-c", "tail -f /dev/null"]
-        imagePullPolicy: Always
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
-        - containerPort: 25
+        - containerPort: {{ .Values.service.port }}
